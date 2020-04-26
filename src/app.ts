@@ -1,7 +1,7 @@
-// Validation
+// Validation of user input
 interface Validatable {
   value: string | number;
-  required: boolean;
+  required?: boolean;
   minLength?: number;
   maxLength?: number;
   min?: number;
@@ -13,8 +13,35 @@ const validate = (validatableInput: Validatable) => {
   if (validatableInput.required) {
     isValid = isValid && validatableInput.value.toString().trim().length !== 0;
   }
+  if (
+    validatableInput.minLength !== undefined &&
+    typeof validatableInput.value === "string"
+  ) {
+    isValid =
+      isValid && validatableInput.value.length > validatableInput.minLength;
+  }
+  if (
+    validatableInput.maxLength !== undefined &&
+    typeof validatableInput.value === "string"
+  ) {
+    isValid =
+      isValid && validatableInput.value.length < validatableInput.maxLength;
+  }
+  if (
+    validatableInput.min != undefined &&
+    typeof validatableInput.value === "number"
+  ) {
+    isValid = isValid && validatableInput.value >= validatableInput.min;
+  }
+  if (
+    validatableInput.max != undefined &&
+    typeof validatableInput.value === "number"
+  ) {
+    isValid = isValid && validatableInput.value <= validatableInput.max;
+  }
   return isValid;
 };
+/////////////////////////////////////////////////////
 
 // Autobind decorator
 function autobind(
@@ -32,7 +59,7 @@ function autobind(
   };
   return adjDescriptor;
 }
-///////////////////////////////////
+/////////////////////////////////////////////////////
 
 // Project input class
 class ProjectInput {
@@ -75,11 +102,30 @@ class ProjectInput {
     const enteredDescription = this.descriptionInputElement.value;
     const enteredPeople = this.peopleInputElement.value;
 
+    const titleValidatable: Validatable = {
+      value: enteredTitle,
+      required: true
+    };
+    const descriptionValidatable: Validatable = {
+      value: enteredDescription,
+      required: true,
+      minLength: 5
+    };
+    const peopleValidatable: Validatable = {
+      value: +enteredPeople,
+      required: true,
+      min: 1,
+      max: 5
+    };
+
     if (
-      validate({ value: enteredTitle, required: true, minLength: 5 }) &&
-      validate({ value: enteredDescription, required: true, minLength: 5 }) &&
-      validate({ value: enteredPeople, required: true, minLength: 5 })
+      !validate(titleValidatable) ||
+      !validate(descriptionValidatable) ||
+      !validate(peopleValidatable)
     ) {
+      console.log(titleValidatable);
+      console.log(descriptionValidatable);
+      console.log(peopleValidatable);
       alert("Invalid input, please try again.");
       return;
     } else {

@@ -10,6 +10,24 @@ const validate = (validatableInput) => {
     if (validatableInput.required) {
         isValid = isValid && validatableInput.value.toString().trim().length !== 0;
     }
+    if (validatableInput.minLength !== undefined &&
+        typeof validatableInput.value === "string") {
+        isValid =
+            isValid && validatableInput.value.length > validatableInput.minLength;
+    }
+    if (validatableInput.maxLength !== undefined &&
+        typeof validatableInput.value === "string") {
+        isValid =
+            isValid && validatableInput.value.length < validatableInput.maxLength;
+    }
+    if (validatableInput.min != undefined &&
+        typeof validatableInput.value === "number") {
+        isValid = isValid && validatableInput.value >= validatableInput.min;
+    }
+    if (validatableInput.max != undefined &&
+        typeof validatableInput.value === "number") {
+        isValid = isValid && validatableInput.value <= validatableInput.max;
+    }
     return isValid;
 };
 function autobind(target, methodName, descriptor) {
@@ -40,9 +58,27 @@ class ProjectInput {
         const enteredTitle = this.titleInputElement.value;
         const enteredDescription = this.descriptionInputElement.value;
         const enteredPeople = this.peopleInputElement.value;
-        if (validate({ value: enteredTitle, required: true, minLength: 5 }) &&
-            validate({ value: enteredDescription, required: true, minLength: 5 }) &&
-            validate({ value: enteredPeople, required: true, minLength: 5 })) {
+        const titleValidatable = {
+            value: enteredTitle,
+            required: true
+        };
+        const descriptionValidatable = {
+            value: enteredDescription,
+            required: true,
+            minLength: 5
+        };
+        const peopleValidatable = {
+            value: +enteredPeople,
+            required: true,
+            min: 1,
+            max: 5
+        };
+        if (!validate(titleValidatable) ||
+            !validate(descriptionValidatable) ||
+            !validate(peopleValidatable)) {
+            console.log(titleValidatable);
+            console.log(descriptionValidatable);
+            console.log(peopleValidatable);
             alert("Invalid input, please try again.");
             return;
         }
