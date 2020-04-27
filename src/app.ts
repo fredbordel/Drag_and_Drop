@@ -102,12 +102,14 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
+  assignedProjects: any[];
 
   constructor(private type: "active" | "finished") {
     this.templateElement = document.getElementById(
       "project-list"
     )! as HTMLTemplateElement;
     this.hostElement = document.getElementById("app") as HTMLDivElement;
+    this.assignedProjects = [];
 
     const importedHTMLContent = document.importNode(
       this.templateElement.content,
@@ -115,8 +117,25 @@ class ProjectList {
     );
     this.element = importedHTMLContent.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
+
+    projectState.addListener((projects: any[]) => {
+      this.assignedProjects = projects;
+      this.renderProjects();
+    });
+
     this.attach();
     this.renderContent();
+  }
+
+  private renderProjects() {
+    const listElement = document.getElementById(
+      `${this.type}-projects-list`
+    )! as HTMLUListElement;
+    for (const prjItem of this.assignedProjects) {
+      const listItem = document.createElement("li");
+      listItem.textContent = prjItem.title;
+      listElement.appendChild(listItem);
+    }
   }
 
   private renderContent() {
