@@ -61,6 +61,32 @@ function autobind(
 }
 /////////////////////////////////////////////////////
 
+// Project list class
+class ProjectList {
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLDivElement;
+  element: HTMLElement;
+
+  constructor(private type: "active" | "finished") {
+    this.templateElement = document.getElementById(
+      "project-list"
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById("app") as HTMLDivElement;
+
+    const importedHTMLContent = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.element = importedHTMLContent.firstElementChild as HTMLElement;
+    this.element.id = `${this.type}-projects`;
+    this.attach();
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement("beforeend", this.element);
+  }
+}
+
 // Project input class
 class ProjectInput {
   templateElement: HTMLTemplateElement;
