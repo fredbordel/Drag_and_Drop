@@ -17,17 +17,19 @@ class Project {
 type Listener<T> = (items: T[]) => void;
 
 abstract class State<T> {
-  private listeners: Listener<T>[] = [];
+  protected listeners: Listener<T>[] = [];
   addListener(listenerFunc: Listener<T>) {
     this.listeners.push(listenerFunc);
   }
 }
 
-class ProjectState {
+class ProjectState extends State<Project> {
   private projects: Project[] = [];
   private static instance: ProjectState;
 
-  private constructor() {}
+  private constructor() {
+    super();
+  }
 
   static getInstance() {
     if (this.instance) {
@@ -154,6 +156,23 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
 
   abstract configure(): void;
   abstract renderContent(): void;
+}
+
+// Project item class - responsible for rendering a single project item
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private projet: Project;
+
+  constructor(hostId: string, project: Project) {
+    super("single-project", hostId, false, project.id);
+    this.projet = project;
+
+    this.configure();
+    this.renderContent();
+  }
+
+  configure() {}
+
+  renderContent() {}
 }
 
 // Project list class
